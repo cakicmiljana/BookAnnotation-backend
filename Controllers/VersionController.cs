@@ -1,0 +1,156 @@
+namespace backend.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using backend.Data;
+using backend.Models;
+using System.IO;
+using System.Text;
+
+[ApiController]
+[Route("api/[controller]")]
+public class VersionController : ControllerBase
+{
+    private BookDbContext Context { get; set; }
+
+    public VersionController(BookDbContext context)
+    {
+        Context = context;
+    }
+
+    [HttpPost("AddVersion/{userId}/{bookId}/{fileType}/{language}")]
+    public async Task<ActionResult> AddVersion(int userId, int bookId, string fileType, string language)
+    {
+        try
+        {
+            Version version = new Version();
+            User user = await Context.Users.FindAsync(userId);
+            Book book = await Context.Books.FindAsync(bookId);
+
+            if (book != null && user != null)
+            {
+
+                version.UserId = userId;
+                version.BookId = bookId;
+                version.FileType = fileType;
+                version.Language = language;
+                version.User = user;
+                version.Book = book;
+                await Context.Versions.AddAsync(version);
+                await Context.SaveChangesAsync();
+                return Ok($"Version added with id {version.Id}.");
+            }
+            else
+                return BadRequest("UNSUCCESSFUL.");
+
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.InnerException?.Message ?? ex.Message);
+        }
+    }
+
+    [HttpGet("GetVersion/{id}")]
+    public async Task<ActionResult> GetVersion(int id)
+    {
+        try
+        {
+            var version = await Context.Versions
+                .Include(version => version.Book)
+                .Where(version => version.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (version != null)
+                return Ok(version);
+            else
+                return BadRequest("UNSUCCESSFUL");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPut("UpdateVersion/{id}/{fileType}/{language}")]
+    public async Task<ActionResult> UpdateVersion(int id, string fileType, string language)
+    {
+        try
+        {
+            var version = await Context.Versions!.FindAsync(id);
+
+            if (version != null)
+            {
+                version.FileType = fileType;
+                version.Language = language;
+
+                await Context.SaveChangesAsync();
+                return Ok("Version updated successfully.");
+            }
+            else
+                return BadRequest("UNSUCCESSFUL");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("DeleteVersion/{id}")]
+    public async Task<ActionResult> DeleteVersion(int id)
+    {
+        try
+        {
+            var version = await Context.Versions.FindAsync(id);
+
+            if (version != null)
+            {
+                Context.Versions.Remove(version);
+                await Context.SaveChangesAsync();
+                return Ok("Version deleted succesfully.");
+            }
+            else
+                return BadRequest("UNSUCCESSFUL.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    //[HttpPost("UploadFile")]
+    //public async Task<IActionResult> UploadFile(IFormFile file, int userId, int bookId)
+    //{
+    //    User user = await Context.Users.FindAsync(userId);
+    //    Book book = await Context.Books.FindAsync(bookId);
+
+    //    if (book != null && user != null)
+    //    {
+
+    //        if (file == null || file.Length == 0)
+    //            return BadRequest("Empty file.");
+
+    //        var ansiEncoding = Encoding.GetEncoding(1250); // Windows-1250
+    //        using var stream = file.OpenReadStream();
+    //        using var reader = new StreamReader(stream, ansiEncoding);
+    //        var ansiText = await reader.ReadToEndAsync();
+
+    //        var version = new Version
+    //        {
+    //            Content = ansiText,
+    //            FileType = "txt",
+    //            Language = "en", // or detect
+    //            UserId = userId,
+    //            User = user,
+    //            BookId = bookId,
+    //            Book = book
+    //        };
+
+    //        Context.Versions.Add(version);
+    //        await Context.SaveChangesAsync();
+
+    //        return Ok(version.ToDto());
+    //    }
+    //    else
+    //        return BadRequest("UNSUCCESSFUL.");
+    //}
+
+}
