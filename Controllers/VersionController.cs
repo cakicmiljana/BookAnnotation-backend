@@ -70,6 +70,64 @@ public class VersionController : ControllerBase
         }
     }
 
+    [HttpGet("GetAllVersions")]
+    public async Task<ActionResult> GetAllVersions()
+    {
+        try
+        {
+            var versions = await Context.Versions
+                .Include(version => version.Book)
+                .ToListAsync();
+
+            return Ok(versions);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("GetVersionsByBookId/{bookId}")]
+    public async Task<ActionResult> GetVersionsByBookId(int bookId)
+    {
+        try
+        {
+            var versions = await Context.Versions
+                .Include(version => version.Book)
+                .Where(version => version.Book.Id == bookId)
+                .ToListAsync();
+
+            if (versions != null)
+                return Ok(versions);
+            else
+                return BadRequest("UNSUCCESSFUL");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("GetVersionsByUserId/{userId}")]
+    public async Task<ActionResult> GetVersionsByUserId(int userId)
+    {
+        try
+        {
+            var versions = await Context.Versions
+                .Where(version => version.User.Id == userId)
+                .ToListAsync();
+
+            if (versions != null)
+                return Ok(versions);
+            else
+                return BadRequest("UNSUCCESSFUL");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpPut("UpdateVersion/{id}/{fileType}/{language}")]
     public async Task<ActionResult> UpdateVersion(int id, string fileType, string language)
     {
