@@ -57,6 +57,21 @@ public class BookController : ControllerBase
         }
     }
 
+    [HttpGet("GetAllBooks")]
+    public async Task<ActionResult> GetAllBooks()
+    {
+        try
+        {
+            var books = await Context.Books.ToListAsync();
+
+            return Ok(books);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpPut("UpdateBook/{id}/{title}/{author}/{country}/{language}/{pages}/{year}")]
     public async Task<ActionResult> UpdateBook(int id, string title, string author, string country, string language, int pages, string description, string year)
     {
