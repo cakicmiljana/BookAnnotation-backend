@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 public class Version
 {
     public int Id { get; set; }
+    [JsonIgnore]
     public string Content { get; set; } = string.Empty;
     public string FileType { get; set; }
     public string Language { get; set; }

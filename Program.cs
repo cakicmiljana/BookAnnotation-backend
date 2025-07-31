@@ -34,7 +34,7 @@ builder.Services.AddCors(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-//Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var app = builder.Build();
 

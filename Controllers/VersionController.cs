@@ -17,8 +17,8 @@ public class VersionController : ControllerBase
         Context = context;
     }
 
-    [HttpPost("AddVersion/{userId}/{bookId}/{fileType}/{language}")]
-    public async Task<ActionResult> AddVersion(int userId, int bookId, string fileType, string language)
+    [HttpPost("AddVersion/{userId}/{bookId}/{fileType}/{language}/{content}")]
+    public async Task<ActionResult> AddVersion(int userId, int bookId, string fileType, string language, string content)
     {
         try
         {
@@ -28,11 +28,13 @@ public class VersionController : ControllerBase
 
             if (book != null && user != null)
             {
+                var utf8 = Encoding.UTF8.GetBytes(content);
 
                 version.UserId = userId;
                 version.BookId = bookId;
                 version.FileType = fileType;
                 version.Language = language;
+                version.Content = Encoding.UTF8.GetString(utf8);
                 version.User = user;
                 version.Book = book;
                 await Context.Versions.AddAsync(version);
@@ -55,8 +57,8 @@ public class VersionController : ControllerBase
         try
         {
             var version = await Context.Versions
-                .Include(version => version.Book)
                 .Where(version => version.Id == id)
+                .Include(version => version.Book)
                 .FirstOrDefaultAsync();
 
             if (version != null)
@@ -128,6 +130,27 @@ public class VersionController : ControllerBase
         }
     }
 
+    [HttpGet("GetContentByVersionId/{id}")]
+    public async Task<ActionResult> GetContentByVersionId(int id)
+    {
+        try
+        {
+            var content = await Context.Versions
+                .Where(version => version.Id == id)
+                .Select(version => version.Content)
+                .FirstOrDefaultAsync();
+
+            if (content != null)
+                return Ok(Encoding.UTF8.GetBytes(content));
+            else
+                return BadRequest("UNSUCCESSFUL");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpPut("UpdateVersion/{id}/{fileType}/{language}")]
     public async Task<ActionResult> UpdateVersion(int id, string fileType, string language)
     {
@@ -173,6 +196,28 @@ public class VersionController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpGet("GetPage")]
+    public async Task<ActionResult<string>> GetPage(int id, int page = 0, int pageSize = 10)
+    {
+        var content = await Context.Versions
+            .Where(version => version.Id == id)
+            .Select(version => version.Content)
+            .FirstOrDefaultAsync();
+
+        if (string.IsNullOrEmpty(content))
+            return NotFound();
+
+        var start = page * pageSize;
+        if (start >= content.Length)
+            return "";
+
+        var pageText = content
+            .Substring(start, Math.Min(pageSize, content.Length - start));
+
+        return Ok(pageText);
+    }
+
 
     //[HttpPost("UploadFile")]
     //public async Task<IActionResult> UploadFile(IFormFile file, int userId, int bookId)
