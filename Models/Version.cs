@@ -10,6 +10,7 @@ public class Version
     public string Content { get; set; } = string.Empty;
     public string FileType { get; set; }
     public string Language { get; set; }
+    public int PageSize { get; set; } = 10000;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public int UserId { get; set; } = -1;
     public User User { get; set; }

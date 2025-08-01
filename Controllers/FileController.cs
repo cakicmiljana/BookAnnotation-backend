@@ -21,8 +21,8 @@ public class FileController : ControllerBase
         Context = context;
     }
 
-    [HttpPost("UploadPdf/{file}/{userId}/{bookId}/{fileType}/{language}")]
-    public async Task<IActionResult> UploadPdf(IFormFile file, int userId, int bookId, string fileType, string language)
+    [HttpPost("UploadPdf/{file}/{userId}/{bookId}/{language}")]
+    public async Task<IActionResult> UploadPdf(IFormFile file, int userId, int bookId, string language)
     {
         if (file == null || file.Length == 0 || !file.FileName.EndsWith(".pdf"))
             return BadRequest("Invalid PDF file.");
@@ -35,23 +35,31 @@ public class FileController : ControllerBase
 
             if (book != null && user != null)
             {
+                using (var stream = file.OpenReadStream())
+                {
+                    // Read PDF text
+                    string text = ExtractTextFromPdf(stream);
 
+                    // Reset stream position to beginning before using it again
+                    stream.Position = 0;
 
-                using var stream = file.OpenReadStream();
+                    // Read page size info
+                    int maxTextLength = GetMaxTextLengthInChars(stream);
 
-                string text = ExtractTextFromPdf(stream);
-                var utf8 = Encoding.UTF8.GetBytes(text);
+                    var utf8 = Encoding.UTF8.GetBytes(text);
 
-                version.UserId = userId;
-                version.BookId = bookId;
-                version.FileType = fileType;
-                version.Language = language;
-                version.Content = Encoding.UTF8.GetString(utf8);
-                //version.Content = text;
-                version.User = user;
-                version.Book = book;
-                await Context.Versions.AddAsync(version);
-                await Context.SaveChangesAsync();
+                    version.UserId = userId;
+                    version.BookId = bookId;
+                    version.FileType = "PDF";
+                    version.Language = language;
+                    version.Content = Encoding.UTF8.GetString(utf8);
+                    version.PageSize = maxTextLength;
+                    version.User = user;
+                    version.Book = book;
+
+                    await Context.Versions.AddAsync(version);
+                    await Context.SaveChangesAsync();
+                }
                 return Ok($"Version added with id {version.Id}.");
             }
             else
@@ -72,7 +80,6 @@ public class FileController : ControllerBase
         {
             foreach (Page page in document.GetPages())
             {
-                document.
                 var words = page.GetWords();
 
                 // Group words by line (roughly same Y coordinate)
@@ -98,4 +105,12 @@ public class FileController : ControllerBase
 
         return sb.ToString();
     }
+
+    private int GetMaxTextLengthInChars(Stream filePath)
+    {
+        var document = PdfDocument.Open(filePath);
+        return document.GetPages()
+                  .Max(p => p.Text.Length);
+    }
+
 }
