@@ -21,7 +21,7 @@ public class FileController : ControllerBase
         Context = context;
     }
 
-    [HttpPost("UploadPdf/{file}/{userId}/{bookId}/{language}")]
+    [HttpPost("UploadPdf/{userId}/{bookId}/{language}")]
     public async Task<IActionResult> UploadPdf(IFormFile file, int userId, int bookId, string language)
     {
         if (file == null || file.Length == 0 || !file.FileName.EndsWith(".pdf"))
@@ -60,7 +60,7 @@ public class FileController : ControllerBase
                     await Context.Versions.AddAsync(version);
                     await Context.SaveChangesAsync();
                 }
-                return Ok($"Version added with id {version.Id}.");
+                return Ok(new { message = $"Version added with id {version.Id}." });
             }
             else
                 return BadRequest("UNSUCCESSFUL.");
