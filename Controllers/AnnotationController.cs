@@ -66,6 +66,26 @@ public class AnnotationController : ControllerBase
         }
     }
 
+    [HttpGet("GetAnnotationsByVersionId/{versionId}")]
+    public async Task<ActionResult> GetAnnotationsByVersionId(int versionId)
+    {
+        try
+        {
+            var annotations = await Context.Annotations
+                .Where(a => a.BookId == versionId)
+                .ToListAsync();
+
+            if (annotations != null)
+                return Ok(annotations);
+            else
+                return BadRequest("UNSUCCESSFUL");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpPut("UpdateAnnotation/{id}/{start}/{end}/{comment}/{tag}")]
     public async Task<ActionResult> UpdateAnnotation(int id, int start, int end, string comment, string tag)
     {

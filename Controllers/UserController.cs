@@ -67,7 +67,7 @@ public class UserController : ControllerBase
                 user.PasswordHash = password;
 
                 await Context.SaveChangesAsync();
-                return Ok("User updated successfully.");
+                return Ok(new { message = "User updated succesfully." });
             }
             else
                 return BadRequest("UNSUCCESSFUL");
@@ -89,7 +89,7 @@ public class UserController : ControllerBase
             {
                 Context.Users.Remove(user);
                 await Context.SaveChangesAsync();
-                return Ok("User deleted succesfully.");
+                return Ok(new { message = "User deleted succesfully."});
             }
             else
                 return BadRequest("UNSUCCESSFUL.");

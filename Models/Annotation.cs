@@ -13,5 +13,6 @@ public class Annotation
     public int EndOffset { get; set; }
     public string Comment { get; set; }
     public string Tag { get; set; }
+    public string Color { get; set; } = "lightblue";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

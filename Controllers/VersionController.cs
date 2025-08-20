@@ -218,42 +218,4 @@ public class VersionController : ControllerBase
         return Ok(pageText);
     }
 
-
-    //[HttpPost("UploadFile")]
-    //public async Task<IActionResult> UploadFile(IFormFile file, int userId, int bookId)
-    //{
-    //    User user = await Context.Users.FindAsync(userId);
-    //    Book book = await Context.Books.FindAsync(bookId);
-
-    //    if (book != null && user != null)
-    //    {
-
-    //        if (file == null || file.Length == 0)
-    //            return BadRequest("Empty file.");
-
-    //        var ansiEncoding = Encoding.GetEncoding(1250); // Windows-1250
-    //        using var stream = file.OpenReadStream();
-    //        using var reader = new StreamReader(stream, ansiEncoding);
-    //        var ansiText = await reader.ReadToEndAsync();
-
-    //        var version = new Version
-    //        {
-    //            Content = ansiText,
-    //            FileType = "txt",
-    //            Language = "en", // or detect
-    //            UserId = userId,
-    //            User = user,
-    //            BookId = bookId,
-    //            Book = book
-    //        };
-
-    //        Context.Versions.Add(version);
-    //        await Context.SaveChangesAsync();
-
-    //        return Ok(version.ToDto());
-    //    }
-    //    else
-    //        return BadRequest("UNSUCCESSFUL.");
-    //}
-
 }

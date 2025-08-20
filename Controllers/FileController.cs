@@ -37,13 +37,9 @@ public class FileController : ControllerBase
             {
                 using (var stream = file.OpenReadStream())
                 {
-                    // Read PDF text
                     string text = ExtractTextFromPdf(stream);
-
-                    // Reset stream position to beginning before using it again
                     stream.Position = 0;
 
-                    // Read page size info
                     int maxTextLength = GetMaxTextLengthInChars(stream);
 
                     var utf8 = Encoding.UTF8.GetBytes(text);
@@ -82,10 +78,9 @@ public class FileController : ControllerBase
             {
                 var words = page.GetWords();
 
-                // Group words by line (roughly same Y coordinate)
                 var lines = words
-                    .GroupBy(w => Math.Round(w.BoundingBox.Bottom, 1)) // adjust precision if needed
-                    .OrderByDescending(g => g.Key); // higher Y is higher on the page
+                    .GroupBy(w => Math.Round(w.BoundingBox.Bottom, 1)) // mozda promeni precision
+                    .OrderByDescending(g => g.Key);
 
                 foreach (var line in lines)
                 {
@@ -96,10 +91,10 @@ public class FileController : ControllerBase
                         sb.Append(word.Text + " ");
                     }
 
-                    sb.AppendLine(); // new line after each grouped Y-row
+                    sb.AppendLine();
                 }
 
-                sb.AppendLine(); // new line between pages
+                sb.AppendLine();
             }
         }
 
@@ -109,8 +104,7 @@ public class FileController : ControllerBase
     private int GetMaxTextLengthInChars(Stream filePath)
     {
         var document = PdfDocument.Open(filePath);
-        return document.GetPages()
-                  .Max(p => p.Text.Length);
+        return document.GetPages().Max(p => p.Text.Length);
     }
 
 }
