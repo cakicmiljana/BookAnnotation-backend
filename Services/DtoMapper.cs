@@ -59,13 +59,13 @@ public static class DtoMapper
     {
         return new AnnotationDto
         {
-            Id = annotation.Id,
             BookId = annotation.BookId,
             UserId = annotation.UserId,
             StartOffset = annotation.StartOffset,
             EndOffset = annotation.EndOffset,
             Comment = annotation.Comment,
             Tag = annotation.Tag,
+            Color = annotation.Color,
             CreatedAt = annotation.CreatedAt
         };
     }
@@ -127,13 +127,13 @@ public static class DtoMapper
     {
         return new Annotation
         {
-            Id = dto.Id,
             BookId = dto.BookId,
             UserId = dto.UserId,
             StartOffset = dto.StartOffset,
             EndOffset = dto.EndOffset,
             Comment = dto.Comment,
             Tag = dto.Tag,
+            Color = dto.Color,
             CreatedAt = dto.CreatedAt
         };
     }

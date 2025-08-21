@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend.Data;
 using backend.Models;
+using backend.DTOs;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -15,29 +16,30 @@ public class AnnotationController : ControllerBase
         Context = context;
     }
 
-    [HttpPost("AddAnnotation/{bookId}/{userId}/{start}/{end}/{comment}/{tag}")]
-    public async Task<ActionResult> AddAnnotation(int bookId, int userId, int start, int end, string comment, string tag)
+    [HttpPost("AddAnnotation")]
+    public async Task<ActionResult> AddAnnotation([FromBody] AnnotationDto dto)
     {
         try
         {
             Annotation annot = new Annotation();
-            User user = await Context.Users.FindAsync(userId);
-            Version book = await Context.Versions.FindAsync(bookId);
+            User user = await Context.Users.FindAsync(dto.UserId);
+            Version version = await Context.Versions.FindAsync(dto.BookId);
 
-            if (book != null && user != null)
+            if (version != null && user != null)
             {
-                annot.BookId = bookId;
-                annot.BookVersion = book;
-                annot.UserId = userId;
+                annot.BookId = dto.BookId;
+                annot.BookVersion = version;
+                annot.UserId = dto.UserId;
                 annot.User = user;
-                annot.StartOffset = start;
-                annot.EndOffset = end;
-                annot.Comment = comment;
-                annot.Tag = tag;
+                annot.StartOffset = dto.StartOffset;
+                annot.EndOffset = dto.EndOffset;
+                annot.Comment = dto.Comment;
+                annot.Tag = dto.Tag;
+                annot.Color = dto.Color ?? "lightblue";
 
                 await Context.Annotations.AddAsync(annot);
                 await Context.SaveChangesAsync();
-                return Ok($"Annotation added with id {annot.Id}.");
+                return Ok(new { message = "Annotation added", id = annot.Id });
             }
             else
                 return BadRequest("UNSUCCESSFUL.");
