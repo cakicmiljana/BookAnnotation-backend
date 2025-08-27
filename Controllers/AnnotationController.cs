@@ -88,19 +88,20 @@ public class AnnotationController : ControllerBase
         }
     }
 
-    [HttpPut("UpdateAnnotation/{id}/{start}/{end}/{comment}/{tag}")]
-    public async Task<ActionResult> UpdateAnnotation(int id, int start, int end, string comment, string tag)
+    [HttpPut("UpdateAnnotation")]
+    public async Task<ActionResult> UpdateAnnotation([FromBody] UpdateAnnotationDto annotation)
     {
         try
         {
-            var annot = await Context.Annotations!.FindAsync(id);
+            var annot = await Context.Annotations!.FindAsync(annotation.Id);
 
             if (annot != null)
             {
-                annot.StartOffset = start;
-                annot.EndOffset = end;
-                annot.Comment = comment;
-                annot.Tag = tag;
+                //annot.StartOffset = annotation.StartOffset;
+                //annot.EndOffset = annotation.EndOffset;
+                annot.Comment = annotation.Comment;
+                annot.Tag = annotation.Tag;
+                annot.Color = annotation.Color;
 
                 await Context.SaveChangesAsync();
                 return Ok("Annotation updated successfully.");

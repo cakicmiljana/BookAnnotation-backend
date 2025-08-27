@@ -70,6 +70,19 @@ public static class DtoMapper
         };
     }
 
+    //public static UpdateAnnotationDto ToDto(this Annotation annotation)
+    //{
+    //    return new AnnotationDto
+    //    {
+    //        Id = annotation.Id,
+    //        StartOffset = annotation.StartOffset,
+    //        EndOffset = annotation.EndOffset,
+    //        Comment = annotation.Comment,
+    //        Tag = annotation.Tag,
+    //        Color = annotation.Color
+    //    };
+    //}
+
     public static backend.Models.Version FromDto(this VersionDto dto)
     {
         return new backend.Models.Version
@@ -137,4 +150,17 @@ public static class DtoMapper
             CreatedAt = dto.CreatedAt
         };
     }
+
+    //public static Annotation FromDto(this UpdateAnnotationDto dto)
+    //{
+    //    return new Annotation
+    //    {
+    //        Id = annotation.Id,
+    //        StartOffset = annotation.StartOffset,
+    //        EndOffset = annotation.EndOffset,
+    //        Comment = annotation.Comment,
+    //        Tag = annotation.Tag,
+    //        Color = annotation.Color
+    //    };
+    //}
 }
