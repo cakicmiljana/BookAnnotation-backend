@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend.Data;
 using backend.Models;
+using backend.DTOs;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -15,22 +16,22 @@ public class NoteController : ControllerBase
         Context = context;
     }
 
-    [HttpPost("AddNote/{bookId}/{userId}/{content}")]
-    public async Task<ActionResult> AddNote(int bookId, int userId, string content)
+    [HttpPost("AddNote")]
+    public async Task<ActionResult> AddNote([FromBody] NoteDto noteDto)
     {
         try
         {
             Note note = new Note();
-            User user = await Context.Users.FindAsync(userId);
-            Version book = await Context.Versions.FindAsync(bookId);
+            User user = await Context.Users.FindAsync(noteDto.UserId);
+            Version book = await Context.Versions.FindAsync(noteDto.BookId);
 
             if (book != null && user != null)
             {
-                note.BookId = bookId;
+                note.BookId = noteDto.BookId;
                 note.BookVersion = book;
-                note.UserId = userId;
+                note.UserId = noteDto.UserId;
                 note.User = user;
-                note.Content= content;
+                note.Content= noteDto.Content;
 
                 await Context.Notes.AddAsync(note);
                 await Context.SaveChangesAsync();
@@ -63,16 +64,36 @@ public class NoteController : ControllerBase
         }
     }
 
-    [HttpPut("UpdateNote/{id}/{content}")]
-    public async Task<ActionResult> UpdateUser(int id, string content)
+    [HttpGet("GetNoteByVersionId/{id}")]
+    public async Task<ActionResult> GetNoteByVersionId(int id)
     {
         try
         {
-            var note = await Context.Notes!.FindAsync(id);
+            var note = await Context.Notes
+                .Where(n => n.BookId == id)
+                .FirstOrDefaultAsync();
+
+            if (note != null)
+                return Ok(note);
+            else
+                return BadRequest("UNSUCCESSFUL");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPut("UpdateNote")]
+    public async Task<ActionResult> UpdateUser([FromBody] NoteDto noteDto)
+    {
+        try
+        {
+            var note = await Context.Notes!.FindAsync(noteDto.Id);
 
             if (note != null)
             {
-                note.Content = content;
+                note.Content = noteDto.Content;
 
                 await Context.SaveChangesAsync();
                 return Ok("Note updated successfully.");

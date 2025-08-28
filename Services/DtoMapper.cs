@@ -35,8 +35,7 @@ public static class DtoMapper
             Id = note.Id,
             BookId = note.BookId,
             UserId = note.UserId,
-            Content = note.Content,
-            CreatedAt = note.CreatedAt
+            Content = note.Content
         };
     }
 
@@ -116,8 +115,7 @@ public static class DtoMapper
             Id = dto.Id,
             BookId = dto.BookId,
             UserId = dto.UserId,
-            Content = dto.Content,
-            CreatedAt = dto.CreatedAt
+            Content = dto.Content
         };
     }
 
