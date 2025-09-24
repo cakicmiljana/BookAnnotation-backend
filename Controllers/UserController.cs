@@ -53,6 +53,26 @@ public class UserController : ControllerBase
         }
     }
 
+    [HttpGet("Login/{username}/{password}")]
+    public async Task<ActionResult> Login(string username, string password)
+    {
+        try
+        {
+            var user = await Context.Users
+                .Where(u => u.Username == username && u.PasswordHash == password)
+                .FirstOrDefaultAsync();
+
+            if (user != null)
+                return Ok(user);
+            else
+                return BadRequest("UNSUCCESSFUL");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpPut("UpdateUser/{id}/{username}/{email}/{password}")]
     public async Task<ActionResult> UpdateUser(int id, string username, string email, string password)
     {

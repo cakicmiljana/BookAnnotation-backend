@@ -89,8 +89,8 @@ public class VersionController : ControllerBase
         }
     }
 
-    [HttpGet("GetVersionsByBookId/{bookId}")]
-    public async Task<ActionResult> GetVersionsByBookId(int bookId)
+    [HttpGet("GetVersionsByBookId/{userId}/{bookId}")]
+    public async Task<ActionResult> GetVersionsByBookId(int userId, int bookId)
     {
         try
         {
@@ -116,7 +116,8 @@ public class VersionController : ControllerBase
         try
         {
             var versions = await Context.Versions
-                .Where(version => version.User.Id == userId)
+                .Where(version => version.UserId == userId)
+                .Include(version => version.Book)
                 .ToListAsync();
 
             if (versions != null)
